@@ -1,3 +1,52 @@
 html, body, #root { height: 100%; }
-body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; display: flex; align-items: center; justify-content: center; }
-.app { text-align: center; padding: 2rem; }
+body { margin: 0; font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+
+/* Valentine theme */
+.valentine-app {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: radial-gradient(circle at 10% 20%, #ff6b6b 0%, transparent 25%), radial-gradient(circle at 90% 80%, #ff4d6d 0%, transparent 20%), linear-gradient(180deg, #ffe6ef 0%, #ffd1e3 50%, #ffdde6 100%);
+}
+
+.card {
+	position: relative;
+	width: min(680px, 94vw);
+	padding: 48px 36px;
+	background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+	box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+	border-radius: 16px;
+	text-align: center;
+	color: #3b0b17;
+}
+
+h1 { font-size: 2.2rem; margin: 0 0 8px; color: #7a021c; }
+.subtitle { margin-top: 0; color: #7a2a35; }
+
+.buttons { position: relative; height: 140px; margin-top: 28px; display: flex; align-items: center; justify-content: center; gap: 18px; }
+.btn { font-size: 1.05rem; padding: 14px 24px; border-radius: 999px; border: none; cursor: pointer; }
+.btn.yes { background: linear-gradient(90deg,#ff3860,#ff6b88); color: white; box-shadow: 0 6px 18px rgba(255,90,120,0.32); }
+.btn.no { background: #fff; color: #7a021c; border: 2px solid #ffd1da; box-shadow: 0 6px 18px rgba(0,0,0,0.08); transition: left 1.4s cubic-bezier(.2,.8,.2,1), top 1.4s cubic-bezier(.2,.8,.2,1); will-change: left, top; }
+
+.result h2 { color: #b3002d; }
+
+.thank { font-size: 1.1rem; color: #7a021c; margin-top: 4px; }
+.quotes { margin-top: 18px; color: #5a151f; }
+.quotes p { margin: 8px 0; font-style: italic; }
+
+/* mobile tweaks */
+@media (max-width: 480px) {
+	.card { padding: 28px 18px; border-radius: 12px; }
+	h1 { font-size: 1.6rem; }
+	.buttons { height: 120px; gap: 12px; }
+	.btn { padding: 12px 18px; font-size: 1rem; }
+	.btn.no { transition-duration: 1.8s; }
+}
+
+/* responsive */
+@media (max-width: 480px) {
+	.card { padding: 28px 18px; }
+	h1 { font-size: 1.6rem; }
+	.buttons { height: 120px; }
+}

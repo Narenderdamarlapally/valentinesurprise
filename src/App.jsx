@@ -1,120 +1,117 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 export default function App() {
-  const [gender, setGender] = useState("male");
-  const [relation, setRelation] = useState("boyfriend");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [stage, setStage] = useState("form"); // form | sent | valentine | final
+  const [answered, setAnswered] = useState(null); // null | yes | no
+  const containerRef = useRef(null);
+  const noRef = useRef(null);
+  const [noPos, setNoPos] = useState({ left: '55%', top: '60%' });
+  const [detached, setDetached] = useState(false);
+  const movingRef = useRef(false);
+  const MOVE_COOLDOWN = 1800; // ms - should match CSS transition duration + small buffer
+  const [isTouch, setIsTouch] = useState(false);
+  const [displayName, setDisplayName] = useState('');
 
   useEffect(() => {
-    // adjust relation when gender changes
-    if (gender === "male") setRelation("boyfriend");
-    else setRelation("girlfriend");
-  }, [gender]);
+    // ensure noPos cleared initially (buttons side-by-side)
+    setNoPos({ left: '55%', top: '60%' });
+    // detect touch devices and disable evasive behavior there
+    const touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    setIsTouch(!!touch);
+  }, []);
 
-  function validateEmail(e) {
-    return /\S+@\S+\.\S+/.test(e);
+  function moveNoButton() {
+    const c = containerRef.current;
+    const n = noRef.current;
+    if (!c || !n) return;
+    if (isTouch) return; // don't move on touch devices
+    if (movingRef.current) return; // prevent repeated rapid moves
+    movingRef.current = true;
+    setTimeout(() => (movingRef.current = false), MOVE_COOLDOWN);
+    const crect = c.getBoundingClientRect();
+    const nrect = n.getBoundingClientRect();
+
+    const padding = 20;
+    const maxLeft = crect.width - nrect.width - padding;
+    const maxTop = crect.height - nrect.height - padding;
+    // detach the No button from the flow and position it at a random safe place
+    const left = Math.max(padding, Math.random() * maxLeft);
+    const top = Math.max(padding, Math.random() * maxTop);
+    setDetached(true);
+    // slight delay to ensure CSS transition applies after detaching
+    setTimeout(() => setNoPos({ left: `${left}px`, top: `${top}px` }), 20);
   }
 
-  function handleSend(e) {
-    e.preventDefault();
-    if (!name.trim() || !validateEmail(email)) return;
-    // simulate sending email
-    setSent(true);
-    setStage("sent");
+  function handleMouseMove(e) {
+    // Move the No button only when the cursor is close to it
+    const c = containerRef.current;
+    const n = noRef.current;
+    if (!c || !n) return;
+    const crect = c.getBoundingClientRect();
+    const nrect = n.getBoundingClientRect();
+
+    const cursorX = e.clientX - crect.left;
+    const cursorY = e.clientY - crect.top;
+    const nCenterX = nrect.left - crect.left + nrect.width / 2;
+    const nCenterY = nrect.top - crect.top + nrect.height / 2;
+
+    const dx = cursorX - nCenterX;
+    const dy = cursorY - nCenterY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const THRESHOLD = 100; // pixels
+    if (dist < THRESHOLD) {
+      moveNoButton();
+    }
   }
 
-  function goToValentine() {
-    setStage("valentine");
-  }
-
-  function handleValentineAnswer(answer) {
-    if (answer === "yes") setStage("final");
-    else setStage("final");
+  function handleYes() {
+    setAnswered('yes');
+    setDisplayName('NAVYA');
   }
 
   return (
-    <div className="app" style={{ maxWidth: 560, margin: "2rem auto", padding: 16 }}>
-      <h1>Valentine Surprise Gift</h1>
+    <div className="valentine-app" ref={containerRef} onMouseMove={handleMouseMove}>
+      <div className="card">
+        {answered === null && (
+          <>
+            <h1>Will you be my Valentine?</h1>
+            <p className="subtitle">Only click <strong>Yes</strong> if you mean it.</p>
 
-      {stage === "form" && (
-        <form onSubmit={handleSend} style={{ display: "grid", gap: 12 }}>
-          <label>
-            Whom are you sending to?
-            <select value={gender} onChange={(e) => setGender(e.target.value)}>
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-            </select>
-          </label>
+            <div className="buttons">
+              <button className="btn yes" onClick={handleYes}>Yes</button>
 
-          <label>
-            Relation
-            <select value={relation} onChange={(e) => setRelation(e.target.value)}>
-              {gender === "male" ? (
-                <>
-                  <option value="boyfriend">Boy Friend</option>
-                  <option value="husband">Husband</option>
-                </>
-              ) : (
-                <>
-                  <option value="girlfriend">Girl Friend</option>
-                  <option value="wife">Wife</option>
-                </>
+              {!detached && (
+                <button className="btn no" ref={noRef} tabIndex={-1} aria-hidden="true">No</button>
               )}
-            </select>
-          </label>
 
-          <label>
-            Name
-            <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Recipient name" />
-          </label>
+              {detached && (
+                <button
+                  className="btn no"
+                  ref={noRef}
+                  style={{ position: 'absolute', left: noPos.left, top: noPos.top }}
+                  tabIndex={-1}
+                  aria-hidden="true"
+                >
+                  No
+                </button>
+              )}
+            </div>
+          </>
+        )}
 
-          <label>
-            Email
-            <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="recipient@example.com" />
-          </label>
+        {answered === 'yes' && (
+          <div className="result">
+            <h2>{displayName}</h2>
+            <p className="thank">Thank you, my wife ❤️</p>
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button type="submit" disabled={!name.trim() || !validateEmail(email)}>
-              Send
-            </button>
+            <div className="quotes">
+              <p>“You are my today and all of my tomorrows.”</p>
+              <p>“I love you not only for what you are, but for what I am when I am with you.”</p>
+              <p>“Every moment with you is a beautiful dream come true.”</p>
+            </div>
           </div>
-        </form>
-      )}
-
-      {stage === "sent" && (
-        <div>
-          <p>Good! Mail sent to {name} ({relation}).</p>
-          <p>
-            <button onClick={goToValentine}>Click me here</button>
-          </p>
-        </div>
-      )}
-
-      {stage === "valentine" && (
-        <div>
-          <h2>Valentine</h2>
-          <p>Will you be my Valentine?</p>
-          <p style={{ fontSize: 14, color: "#666" }}>Note: "No" is the default state — only click Yes to accept.</p>
-          <div style={{ display: "flex", gap: 8, marginTop: 8 }}>
-            <button onClick={() => handleValentineAnswer("yes")} style={{ background: "#e83e8c", color: "white" }}>
-              Yes
-            </button>
-            <button onClick={() => handleValentineAnswer("no")} style={{ background: "#ddd" }}>
-              No
-            </button>
-          </div>
-        </div>
-      )}
-
-      {stage === "final" && (
-        <div>
-          <h2>Thank you!</h2>
-          <p>Congratulations — your message was delivered.</p>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
