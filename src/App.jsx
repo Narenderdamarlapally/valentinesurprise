@@ -77,15 +77,18 @@ export default function App() {
 
     const cursorX = e.clientX - crect.left;
     const cursorY = e.clientY - crect.top;
-    const nCenterX = nrect.left - crect.left + nrect.width / 2;
-    const nCenterY = nrect.top - crect.top + nrect.height / 2;
+    // compute distance from cursor to the NO button rectangle (0 if inside)
+    const btnLeft = nrect.left - crect.left;
+    const btnTop = nrect.top - crect.top;
+    const btnRight = btnLeft + nrect.width;
+    const btnBottom = btnTop + nrect.height;
 
-    const dx = cursorX - nCenterX;
-    const dy = cursorY - nCenterY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
+    const dxRect = Math.max(btnLeft - cursorX, 0, cursorX - btnRight);
+    const dyRect = Math.max(btnTop - cursorY, 0, cursorY - btnBottom);
+    const rectDist = Math.sqrt(dxRect * dxRect + dyRect * dyRect);
 
-    const THRESHOLD = 60; // smaller threshold so it only triggers when very close
-    if (dist < THRESHOLD) {
+    const THRESHOLD = 110; // pixels — triggers when cursor is near the button rect
+    if (rectDist < THRESHOLD) {
       // pass cursor position relative to card
       moveNoButton(cursorX, cursorY);
     }
