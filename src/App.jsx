@@ -152,7 +152,7 @@ export default function App() {
         {answered === 'yes' && (
           <div className="result">
             <h2>{displayName}</h2>
-            <p className="thank">Thank you, my wife ❤️</p>
+            <p className="thank">Thank you, my ❤️</p>
 
             <div className="quotes">
               <p>“You are my today and all of my tomorrows.”</p>
