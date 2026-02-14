@@ -103,6 +103,42 @@ export default function App() {
     }
   }
 
+  function handleNoTouch(e) {
+    const c = cardRef.current;
+    const n = noRef.current;
+    if (!c || !n) return;
+    if (movingRef.current) return;
+    movingRef.current = true;
+    setTimeout(() => (movingRef.current = false), MOVE_COOLDOWN);
+    const crect = c.getBoundingClientRect();
+    const btnWidth = n.offsetWidth || n.getBoundingClientRect().width || 80;
+    const btnHeight = n.offsetHeight || n.getBoundingClientRect().height || 40;
+
+    const padding = 12;
+    const minLeft = padding;
+    const maxLeft = Math.max(0, crect.width - btnWidth - padding);
+
+    const nrect = n.getBoundingClientRect();
+    const nCenterX = nrect.left - crect.left + btnWidth / 2;
+    const nCenterY = nrect.top - crect.top + btnHeight / 2;
+
+    const moveDist = Math.max(crect.width, crect.height) * 0.35;
+
+    const clientX = (e && (e.clientX || (e.touches && e.touches[0] && e.touches[0].clientX))) || (crect.left + crect.width / 2);
+    const cursorX = clientX - crect.left;
+
+    const nx = cursorX >= nCenterX ? -1 : 1;
+    let newCenterX = Math.round(nCenterX + nx * moveDist);
+
+    newCenterX = Math.min(Math.max(newCenterX, minLeft + btnWidth / 2), maxLeft + btnWidth / 2);
+
+    const left = Math.round(newCenterX - btnWidth / 2);
+    const top = Math.round(nCenterY - btnHeight / 2);
+
+    setDetached(true);
+    setTimeout(() => setNoPos({ left: `${left}px`, top: `${top}px` }), 20);
+  }
+
   function handleYes() {
     setAnswered('yes');
     // ensure document title shows the chosen name
@@ -126,7 +162,7 @@ export default function App() {
                   className="btn no"
                   ref={noRef}
                   {...(isTouch
-                    ? { onClick: () => {}, tabIndex: 0, 'aria-disabled': true }
+                    ? { onClick: handleNoTouch, tabIndex: 0, 'aria-disabled': true }
                     : { tabIndex: -1, 'aria-hidden': true })}
                 >
                   No
@@ -139,7 +175,7 @@ export default function App() {
                   ref={noRef}
                   style={{ position: 'absolute', left: noPos.left, top:   noPos.top }}
                   {...(isTouch
-                    ? { onClick: () => {}, tabIndex: 0, 'aria-disabled': true }
+                    ? { onClick: handleNoTouch, tabIndex: 0, 'aria-disabled': true }
                     : { tabIndex: -1, 'aria-hidden': true })}
                 >
                   No
