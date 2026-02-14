@@ -137,9 +137,9 @@ export default function App() {
                 <button
                   className="btn no"
                   ref={noRef}
-                  style={{ position: 'absolute', left: noPos.left, top: noPos.top }}
+                  style={{ position: 'absolute', left: noPos.left, top:   noPos.top }}
                   {...(isTouch
-                    ? { onClick: () => { window.location.href = 'about:blank'; }, tabIndex: 0 }
+                    ? { onClick: () => {}, tabIndex: 0 }
                     : { tabIndex: -1, 'aria-hidden': true })}
                 >
                   No
