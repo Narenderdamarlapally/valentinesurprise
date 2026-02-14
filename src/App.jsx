@@ -17,6 +17,15 @@ export default function App() {
     // detect touch devices and disable evasive behavior there
     const touch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
     setIsTouch(!!touch);
+
+    // read `name` from URL params (case-insensitive) and set display name
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const name = params.get('name') || params.get('Name') || params.get('NAME') || '';
+      if (name) setDisplayName(String(name).toUpperCase());
+    } catch (err) {
+      // ignore in non-browser or malformed URL
+    }
   }, []);
 
   function moveNoButton(cursorX, cursorY) {
@@ -96,7 +105,8 @@ export default function App() {
 
   function handleYes() {
     setAnswered('yes');
-    setDisplayName('NAVYA');
+    // ensure document title shows the chosen name
+    if (displayName) document.title = displayName;
   }
 
   return (
@@ -115,7 +125,9 @@ export default function App() {
                 <button
                   className="btn no"
                   ref={noRef}
-                  {...(isTouch ? { onClick: () => setAnswered('no'), tabIndex: 0 } : { tabIndex: -1, 'aria-hidden': true })}
+                  {...(isTouch
+                    ? { onClick: () => { window.location.href = 'about:blank'; }, tabIndex: 0 }
+                    : { tabIndex: -1, 'aria-hidden': true })}
                 >
                   No
                 </button>
@@ -126,7 +138,9 @@ export default function App() {
                   className="btn no"
                   ref={noRef}
                   style={{ position: 'absolute', left: noPos.left, top: noPos.top }}
-                  {...(isTouch ? { onClick: () => setAnswered('no'), tabIndex: 0 } : { tabIndex: -1, 'aria-hidden': true })}
+                  {...(isTouch
+                    ? { onClick: () => { window.location.href = 'about:blank'; }, tabIndex: 0 }
+                    : { tabIndex: -1, 'aria-hidden': true })}
                 >
                   No
                 </button>
