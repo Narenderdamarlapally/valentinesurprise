@@ -126,7 +126,7 @@ export default function App() {
                   className="btn no"
                   ref={noRef}
                   {...(isTouch
-                    ? { onClick: () => { window.location.href = 'about:blank'; }, tabIndex: 0 }
+                    ? { onClick: () => {}, tabIndex: 0, 'aria-disabled': true }
                     : { tabIndex: -1, 'aria-hidden': true })}
                 >
                   No
@@ -139,7 +139,7 @@ export default function App() {
                   ref={noRef}
                   style={{ position: 'absolute', left: noPos.left, top:   noPos.top }}
                   {...(isTouch
-                    ? { onClick: () => {}, tabIndex: 0 }
+                    ? { onClick: () => {}, tabIndex: 0, 'aria-disabled': true }
                     : { tabIndex: -1, 'aria-hidden': true })}
                 >
                   No
