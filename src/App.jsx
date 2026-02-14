@@ -75,7 +75,8 @@ export default function App() {
         {answered === null && (
           <>
             <h1>Will you be my Valentine?</h1>
-            <p className="subtitle">Only click <strong>Yes</strong> if you mean it.</p>
+            {/* <p className="subtitle">Only click <strong>Yes</strong> if you mean it.</p> */}
+<p>click <strong>Yes</strong> to promise to love, cherish, and grow together, or click <strong>No</strong> to be honest."</p>
 
             <div className="buttons">
               <button className="btn yes" onClick={handleYes}>Yes</button>
